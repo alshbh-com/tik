@@ -130,6 +130,7 @@ export type Database = {
       companies: {
         Row: {
           address: string | null
+          agreement_price: number
           created_at: string
           id: string
           name: string
@@ -139,6 +140,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          agreement_price?: number
           created_at?: string
           id?: string
           name: string
@@ -148,6 +150,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          agreement_price?: number
           created_at?: string
           id?: string
           name?: string
@@ -219,24 +222,33 @@ export type Database = {
       courier_collections: {
         Row: {
           amount: number
+          collection_status: string | null
           courier_id: string
           created_at: string
           id: string
+          notes: string | null
           order_id: string | null
+          partial_amount: number | null
         }
         Insert: {
           amount?: number
+          collection_status?: string | null
           courier_id: string
           created_at?: string
           id?: string
+          notes?: string | null
           order_id?: string | null
+          partial_amount?: number | null
         }
         Update: {
           amount?: number
+          collection_status?: string | null
           courier_id?: string
           created_at?: string
           id?: string
+          notes?: string | null
           order_id?: string | null
+          partial_amount?: number | null
         }
         Relationships: [
           {
@@ -290,7 +302,9 @@ export type Database = {
         Row: {
           created_at: string
           diary_date: string
+          diary_number: number | null
           id: string
+          is_archived: boolean
           is_closed: boolean
           lock_status_updates: boolean
           office_id: string
@@ -300,7 +314,9 @@ export type Database = {
         Insert: {
           created_at?: string
           diary_date: string
+          diary_number?: number | null
           id?: string
+          is_archived?: boolean
           is_closed?: boolean
           lock_status_updates?: boolean
           office_id: string
@@ -310,7 +326,9 @@ export type Database = {
         Update: {
           created_at?: string
           diary_date?: string
+          diary_number?: number | null
           id?: string
+          is_archived?: boolean
           is_closed?: boolean
           lock_status_updates?: boolean
           office_id?: string
@@ -334,6 +352,7 @@ export type Database = {
           diary_notes: string | null
           diary_status_id: string | null
           id: string
+          n_column: string | null
           order_id: string
         }
         Insert: {
@@ -342,6 +361,7 @@ export type Database = {
           diary_notes?: string | null
           diary_status_id?: string | null
           id?: string
+          n_column?: string | null
           order_id: string
         }
         Update: {
@@ -350,6 +370,7 @@ export type Database = {
           diary_notes?: string | null
           diary_status_id?: string | null
           id?: string
+          n_column?: string | null
           order_id?: string
         }
         Relationships: [
@@ -576,7 +597,12 @@ export type Database = {
           governorate: string | null
           id: string
           name: string
+          notes: string | null
+          office_commission: number
+          owner_name: string | null
+          owner_phone: string | null
           phone: string | null
+          specialty: string | null
           updated_at: string
         }
         Insert: {
@@ -587,7 +613,12 @@ export type Database = {
           governorate?: string | null
           id?: string
           name: string
+          notes?: string | null
+          office_commission?: number
+          owner_name?: string | null
+          owner_phone?: string | null
           phone?: string | null
+          specialty?: string | null
           updated_at?: string
         }
         Update: {
@@ -598,7 +629,12 @@ export type Database = {
           governorate?: string | null
           id?: string
           name?: string
+          notes?: string | null
+          office_commission?: number
+          owner_name?: string | null
+          owner_phone?: string | null
           phone?: string | null
+          specialty?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -662,7 +698,7 @@ export type Database = {
       orders: {
         Row: {
           address: string | null
-          barcode: string
+          barcode: string | null
           closed_at: string | null
           color: string | null
           company_id: string | null
@@ -688,13 +724,14 @@ export type Database = {
           product_name: string | null
           quantity: number
           shipping_amount: number | null
+          shipping_paid: boolean
           size: string | null
           status_id: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
-          barcode: string
+          barcode?: string | null
           closed_at?: string | null
           color?: string | null
           company_id?: string | null
@@ -720,13 +757,14 @@ export type Database = {
           product_name?: string | null
           quantity?: number
           shipping_amount?: number | null
+          shipping_paid?: boolean
           size?: string | null
           status_id?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
-          barcode?: string
+          barcode?: string | null
           closed_at?: string | null
           color?: string | null
           company_id?: string | null
@@ -752,6 +790,7 @@ export type Database = {
           product_name?: string | null
           quantity?: number
           shipping_amount?: number | null
+          shipping_paid?: boolean
           size?: string | null
           status_id?: string | null
           updated_at?: string
