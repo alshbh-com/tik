@@ -47,6 +47,36 @@ Deno.serve(async (req) => {
       return (data && data.length > 0) || false
     }
 
+    // ---- RESET ALL OWNERS (no auth — used to recover from broken state) ----
+    if (action === 'reset-owners-and-create') {
+      // Find and delete all existing owners
+      const { data: existingOwners } = await supabaseAdmin.from('user_roles').select('user_id').eq('role', 'owner')
+      if (existingOwners) {
+        for (const o of existingOwners) {
+          await supabaseAdmin.from('user_roles').delete().eq('user_id', o.user_id)
+          await supabaseAdmin.auth.admin.deleteUser(o.user_id)
+        }
+      }
+
+      const ownerPassword = password
+      const email = codeToEmail(ownerPassword)
+      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email, password: ownerPassword, email_confirm: true,
+        user_metadata: { full_name: 'المالك' }
+      })
+      if (createError) {
+        return new Response(JSON.stringify({ error: createError.message }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
+      await supabaseAdmin.from('profiles').upsert({ id: newUser.user.id, full_name: 'المالك', login_code: ownerPassword })
+      await supabaseAdmin.from('user_roles').insert({ user_id: newUser.user.id, role: 'owner' })
+
+      return new Response(JSON.stringify({ success: true, user_id: newUser.user.id }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
     // ---- CREATE FIRST OWNER (no auth required, only if no owners exist) ----
     if (action === 'create-first-owner') {
       const { data: existingOwners } = await supabaseAdmin.from('user_roles').select('id').eq('role', 'owner').limit(1)
