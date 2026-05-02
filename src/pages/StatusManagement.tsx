@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { ArrowUp, ArrowDown, Lock, Palette, Check } from 'lucide-react';
+import { ArrowUp, ArrowDown, Lock, Palette, Check, Plus, Trash2, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function StatusManagement() {
@@ -13,6 +13,41 @@ export default function StatusManagement() {
   const [orderCounts, setOrderCounts] = useState<Record<string, number>>({});
   const [editingColorId, setEditingColorId] = useState<string | null>(null);
   const [colorValue, setColorValue] = useState('');
+  const [editingNameId, setEditingNameId] = useState<string | null>(null);
+  const [nameValue, setNameValue] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newColor, setNewColor] = useState('#6b7280');
+  const [adding, setAdding] = useState(false);
+
+  const addStatus = async () => {
+    const name = newName.trim();
+    if (!name) { toast.error('أدخل اسم الحالة'); return; }
+    const maxOrder = statuses.reduce((m, s) => Math.max(m, s.sort_order || 0), 0);
+    const { error } = await supabase.from('order_statuses').insert({ name, color: newColor, sort_order: maxOrder + 1 });
+    if (error) { toast.error(error.message); return; }
+    toast.success('تمت إضافة الحالة');
+    setNewName(''); setNewColor('#6b7280'); setAdding(false);
+    loadData();
+  };
+
+  const deleteStatus = async (s: any) => {
+    if ((orderCounts[s.id] || 0) > 0) { toast.error('لا يمكن حذف حالة مستخدمة في أوردرات'); return; }
+    if (!confirm(`حذف الحالة "${s.name}"؟`)) return;
+    const { error } = await supabase.from('order_statuses').delete().eq('id', s.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('تم الحذف');
+    loadData();
+  };
+
+  const saveName = async (id: string) => {
+    const name = nameValue.trim();
+    if (!name) return;
+    const { error } = await supabase.from('order_statuses').update({ name }).eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('تم التحديث');
+    setEditingNameId(null);
+    loadData();
+  };
 
   useEffect(() => { loadData(); }, []);
 
