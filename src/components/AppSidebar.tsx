@@ -86,7 +86,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
           <img src={logo} alt="TikExpress" className="h-9 w-9 shrink-0 rounded-xl object-cover" />
           <span className="text-lg font-extrabold text-sidebar-foreground group-data-[collapsible=icon]:hidden tracking-wide">
-            القرش
+            TikExpress
           </span>
         </div>
       </SidebarHeader>
