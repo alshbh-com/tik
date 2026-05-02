@@ -193,9 +193,15 @@ export default function StatusManagement() {
                     </TableCell>
                     <TableCell className="text-center font-bold">{orderCounts[s.id] || 0}</TableCell>
                     <TableCell>
-                      <div className="flex gap-1 justify-center">
+                      <div className="flex gap-1 justify-center flex-wrap">
                         <Button size="sm" variant="outline" className="text-xs gap-1 h-7" onClick={() => startEditColor(s)}>
-                          <Palette className="h-3 w-3" /> تغيير اللون
+                          <Palette className="h-3 w-3" /> اللون
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-xs gap-1 h-7" onClick={() => { setEditingNameId(s.id); setNameValue(s.name); }}>
+                          <Pencil className="h-3 w-3" /> تعديل
+                        </Button>
+                        <Button size="sm" variant="destructive" className="text-xs gap-1 h-7" onClick={() => deleteStatus(s)}>
+                          <Trash2 className="h-3 w-3" /> حذف
                         </Button>
                       </div>
                     </TableCell>
