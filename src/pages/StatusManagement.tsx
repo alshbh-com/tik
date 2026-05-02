@@ -104,7 +104,27 @@ export default function StatusManagement() {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-xl sm:text-2xl font-bold">إدارة الحالات</h1>
+        <Button onClick={() => setAdding(v => !v)} size="sm" className="gap-1">
+          <Plus className="h-4 w-4" /> إضافة حالة جديدة
+        </Button>
       </div>
+
+      {adding && (
+        <Card className="bg-card border-border">
+          <CardContent className="p-3 flex flex-wrap gap-2 items-center">
+            <Input
+              placeholder="اسم الحالة (مثال: تم التسليم)"
+              value={newName}
+              onChange={e => setNewName(e.target.value)}
+              className="flex-1 min-w-[200px] bg-secondary border-border"
+              onKeyDown={e => { if (e.key === 'Enter') addStatus(); }}
+            />
+            <Input type="color" value={newColor} onChange={e => setNewColor(e.target.value)} className="w-14 h-9 p-0 border-0 cursor-pointer bg-transparent" />
+            <Button size="sm" onClick={addStatus}><Check className="h-4 w-4 ml-1" /> حفظ</Button>
+            <Button size="sm" variant="ghost" onClick={() => { setAdding(false); setNewName(''); }}><X className="h-4 w-4" /></Button>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="bg-card border-border">
         <CardContent className="p-0">
