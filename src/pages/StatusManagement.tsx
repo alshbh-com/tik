@@ -149,7 +149,25 @@ export default function StatusManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge style={{ backgroundColor: (s.color || '#6b7280') + '30', color: s.color || '#6b7280' }}>{s.name}</Badge>
+                      {editingNameId === s.id ? (
+                        <div className="flex items-center gap-1">
+                          <Input
+                            value={nameValue}
+                            onChange={e => setNameValue(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') saveName(s.id); if (e.key === 'Escape') setEditingNameId(null); }}
+                            className="h-7 w-40 bg-secondary border-border"
+                            autoFocus
+                          />
+                          <Button size="icon" variant="ghost" className="h-7 w-7 text-green-500" onClick={() => saveName(s.id)}>
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingNameId(null)}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Badge style={{ backgroundColor: (s.color || '#6b7280') + '30', color: s.color || '#6b7280' }}>{s.name}</Badge>
+                      )}
                     </TableCell>
                     <TableCell className="text-center">
                       {editingColorId === s.id ? (
