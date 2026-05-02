@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { ArrowUp, ArrowDown, Lock, Palette, Check } from 'lucide-react';
+import { ArrowUp, ArrowDown, Lock, Palette, Check, Plus, Trash2, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function StatusManagement() {
@@ -13,6 +13,41 @@ export default function StatusManagement() {
   const [orderCounts, setOrderCounts] = useState<Record<string, number>>({});
   const [editingColorId, setEditingColorId] = useState<string | null>(null);
   const [colorValue, setColorValue] = useState('');
+  const [editingNameId, setEditingNameId] = useState<string | null>(null);
+  const [nameValue, setNameValue] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newColor, setNewColor] = useState('#6b7280');
+  const [adding, setAdding] = useState(false);
+
+  const addStatus = async () => {
+    const name = newName.trim();
+    if (!name) { toast.error('أدخل اسم الحالة'); return; }
+    const maxOrder = statuses.reduce((m, s) => Math.max(m, s.sort_order || 0), 0);
+    const { error } = await supabase.from('order_statuses').insert({ name, color: newColor, sort_order: maxOrder + 1 });
+    if (error) { toast.error(error.message); return; }
+    toast.success('تمت إضافة الحالة');
+    setNewName(''); setNewColor('#6b7280'); setAdding(false);
+    loadData();
+  };
+
+  const deleteStatus = async (s: any) => {
+    if ((orderCounts[s.id] || 0) > 0) { toast.error('لا يمكن حذف حالة مستخدمة في أوردرات'); return; }
+    if (!confirm(`حذف الحالة "${s.name}"؟`)) return;
+    const { error } = await supabase.from('order_statuses').delete().eq('id', s.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('تم الحذف');
+    loadData();
+  };
+
+  const saveName = async (id: string) => {
+    const name = nameValue.trim();
+    if (!name) return;
+    const { error } = await supabase.from('order_statuses').update({ name }).eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('تم التحديث');
+    setEditingNameId(null);
+    loadData();
+  };
 
   useEffect(() => { loadData(); }, []);
 
@@ -69,7 +104,27 @@ export default function StatusManagement() {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-xl sm:text-2xl font-bold">إدارة الحالات</h1>
+        <Button onClick={() => setAdding(v => !v)} size="sm" className="gap-1">
+          <Plus className="h-4 w-4" /> إضافة حالة جديدة
+        </Button>
       </div>
+
+      {adding && (
+        <Card className="bg-card border-border">
+          <CardContent className="p-3 flex flex-wrap gap-2 items-center">
+            <Input
+              placeholder="اسم الحالة (مثال: تم التسليم)"
+              value={newName}
+              onChange={e => setNewName(e.target.value)}
+              className="flex-1 min-w-[200px] bg-secondary border-border"
+              onKeyDown={e => { if (e.key === 'Enter') addStatus(); }}
+            />
+            <Input type="color" value={newColor} onChange={e => setNewColor(e.target.value)} className="w-14 h-9 p-0 border-0 cursor-pointer bg-transparent" />
+            <Button size="sm" onClick={addStatus}><Check className="h-4 w-4 ml-1" /> حفظ</Button>
+            <Button size="sm" variant="ghost" onClick={() => { setAdding(false); setNewName(''); }}><X className="h-4 w-4" /></Button>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="bg-card border-border">
         <CardContent className="p-0">
@@ -94,7 +149,25 @@ export default function StatusManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge style={{ backgroundColor: (s.color || '#6b7280') + '30', color: s.color || '#6b7280' }}>{s.name}</Badge>
+                      {editingNameId === s.id ? (
+                        <div className="flex items-center gap-1">
+                          <Input
+                            value={nameValue}
+                            onChange={e => setNameValue(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') saveName(s.id); if (e.key === 'Escape') setEditingNameId(null); }}
+                            className="h-7 w-40 bg-secondary border-border"
+                            autoFocus
+                          />
+                          <Button size="icon" variant="ghost" className="h-7 w-7 text-green-500" onClick={() => saveName(s.id)}>
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingNameId(null)}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Badge style={{ backgroundColor: (s.color || '#6b7280') + '30', color: s.color || '#6b7280' }}>{s.name}</Badge>
+                      )}
                     </TableCell>
                     <TableCell className="text-center">
                       {editingColorId === s.id ? (
@@ -120,9 +193,15 @@ export default function StatusManagement() {
                     </TableCell>
                     <TableCell className="text-center font-bold">{orderCounts[s.id] || 0}</TableCell>
                     <TableCell>
-                      <div className="flex gap-1 justify-center">
+                      <div className="flex gap-1 justify-center flex-wrap">
                         <Button size="sm" variant="outline" className="text-xs gap-1 h-7" onClick={() => startEditColor(s)}>
-                          <Palette className="h-3 w-3" /> تغيير اللون
+                          <Palette className="h-3 w-3" /> اللون
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-xs gap-1 h-7" onClick={() => { setEditingNameId(s.id); setNameValue(s.name); }}>
+                          <Pencil className="h-3 w-3" /> تعديل
+                        </Button>
+                        <Button size="sm" variant="destructive" className="text-xs gap-1 h-7" onClick={() => deleteStatus(s)}>
+                          <Trash2 className="h-3 w-3" /> حذف
                         </Button>
                       </div>
                     </TableCell>
