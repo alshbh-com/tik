@@ -9,9 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { ReportButton } from '@/components/ReportButton';
 import { CheckCircle2, XCircle, RotateCcw, Package } from 'lucide-react';
 
-const DELIVERED_NAMES = ['تم التسليم', 'تسليم جزئي'];
-const RETURNED_NAMES = ['مرتجع', 'تهرب', 'لم يرد', 'ملغي'];
-const REJECTED_NAMES = ['رفض ودفع شحن', 'رفض ولم يدفع شحن'];
+const DELIVERED_NAMES = ['تم التسليم', 'تم التوصيل', 'تسليم جزئي'];
+const RETURNED_NAMES = ['مرتجع', 'تهرب', 'تهرب من الاستلام', 'لم يرد', 'ملغي'];
+const REJECTED_NAMES = ['رفض ودفع شحن', 'رفض ولم يدفع شحن', 'رفض ورفض'];
 
 export default function CourierReceipt() {
   const [couriers, setCouriers] = useState<any[]>([]);
@@ -232,7 +232,7 @@ function ReceiptSection({ title, items, color }: { title: string; items: any[]; 
             <TableBody>
               {items.map(o => {
                 let amount = 0;
-                if (o.order_statuses?.name === 'تم التسليم') amount = Number(o.price || 0) + Number(o.delivery_price || 0);
+                if (o.order_statuses?.name === 'تم التسليم' || o.order_statuses?.name === 'تم التوصيل') amount = Number(o.price || 0) + Number(o.delivery_price || 0);
                 else if (o.order_statuses?.name === 'تسليم جزئي') amount = Number(o.partial_amount || 0);
                 else if (REJECTED_NAMES.includes(o.order_statuses?.name)) amount = Number(o.shipping_paid || 0);
                 return (
