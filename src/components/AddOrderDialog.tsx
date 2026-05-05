@@ -58,6 +58,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
     size: order?.size || '',
     address: order?.address || '',
     notes: order?.notes || '',
+    governorate: order?.governorate || '',
     priority: order?.priority || 'normal',
   });
 
