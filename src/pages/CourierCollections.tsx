@@ -16,6 +16,11 @@ import { logActivity } from '@/lib/activityLogger';
 // Note: any order assigned to a courier can be closed regardless of its status
 import { ReportButton } from '@/components/ReportButton';
 
+const DELIVERED_STATUS_NAMES = ['تم التسليم', 'تم التوصيل'];
+const PARTIAL_STATUS_NAMES = ['تسليم جزئي'];
+const PAID_SHIPPING_STATUS_NAMES = ['رفض ودفع شحن', 'استلم ودفع نص الشحن'];
+const COMMISSION_STATUS_NAMES = [...DELIVERED_STATUS_NAMES, ...PARTIAL_STATUS_NAMES, ...PAID_SHIPPING_STATUS_NAMES];
+
 export default function CourierCollections() {
   const { user, isOwner } = useAuth();
   const [couriers, setCouriers] = useState<any[]>([]);
@@ -54,7 +59,6 @@ export default function CourierCollections() {
   }, []);
 
   // Auto-select commission-eligible statuses when statuses load
-  const COMMISSION_STATUS_NAMES = ['تم التسليم', 'تسليم جزئي', 'رفض ودفع شحن', 'استلم ودفع نص الشحن'];
   useEffect(() => {
     if (statuses.length === 0) return;
     const autoIds = statuses.filter(s => COMMISSION_STATUS_NAMES.includes(s.name)).map(s => s.id);
