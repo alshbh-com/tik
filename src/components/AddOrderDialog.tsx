@@ -90,10 +90,11 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
   };
 
   const loadDropdowns = async (orderForEdit?: any) => {
-    const [o, p, s] = await Promise.all([
+    const [o, p, s, g] = await Promise.all([
       supabase.from('offices').select('id, name').order('name'),
       supabase.from('products').select('id, name, quantity').order('name'),
       supabase.from('order_statuses').select('id, name').order('sort_order'),
+      supabase.from('delivery_prices').select('id, governorate, price, office_id').order('governorate'),
     ]);
 
     const loadedOffices = o.data || [];
@@ -109,6 +110,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
     setOffices(loadedOffices);
     setProducts(p.data || []);
     setStatuses(s.data || []);
+    setGovernorates(g.data || []);
   };
 
   // Build unique suggestion lists
