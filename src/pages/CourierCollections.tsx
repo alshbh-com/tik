@@ -358,9 +358,9 @@ export default function CourierCollections() {
             const COMMISSION_NAMES = COMMISSION_STATUS_NAMES;
             const getCollected = (o: any) => {
               const sn = o.order_statuses?.name;
-              if (sn === 'تم التسليم') return Number(o.price || 0) + Number(o.delivery_price || 0);
-              if (sn === 'تسليم جزئي') return Number(o.partial_amount || 0);
-              if (sn === 'رفض ودفع شحن' || sn === 'استلم ودفع نص الشحن') return Number(o.shipping_paid || 0);
+              if (DELIVERED_STATUS_NAMES.includes(sn)) return Number(o.price || 0) + Number(o.delivery_price || 0);
+              if (PARTIAL_STATUS_NAMES.includes(sn)) return Number(o.partial_amount || 0);
+              if (PAID_SHIPPING_STATUS_NAMES.includes(sn)) return Number(o.shipping_paid || 0);
               return 0;
             };
             const closedCount = closedOrdersOnDate.length;
