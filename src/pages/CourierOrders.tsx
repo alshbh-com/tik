@@ -319,16 +319,7 @@ export default function CourierOrders() {
               <span className="font-bold text-lg">{totalPrice} ج.م</span>
             </div>
             {(() => {
-              const deliveredTotal = orders
-                .filter(o => o.order_statuses?.name === 'تم التسليم')
-                .reduce((sum, o) => sum + Number(o.price) + Number(o.delivery_price), 0);
-              const partialTotal = orders
-                .filter(o => o.order_statuses?.name === 'تسليم جزئي')
-                .reduce((sum, o) => sum + Number(o.partial_amount || 0), 0);
-              const rejectShipTotal = orders
-                .filter(o => ['رفض ودفع شحن', 'استلم ودفع نص الشحن'].includes(o.order_statuses?.name))
-                .reduce((sum, o) => sum + Number(o.shipping_paid || 0), 0);
-              const totalCollection = deliveredTotal + partialTotal + rejectShipTotal;
+              const totalCollection = orders.reduce((sum, o) => sum + getOrderCollectedAmount(o), 0);
               return (
                 <div className="flex justify-between items-center border-t border-border pt-2">
                   <span className="text-sm font-medium text-emerald-600">إجمالي التحصيل</span>
