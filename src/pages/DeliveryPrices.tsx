@@ -53,7 +53,7 @@ export default function DeliveryPrices() {
   };
 
   const edit = (item: any) => {
-    setEditId(item.id); setOfficeId(item.office_id); setGovernorate(item.governorate); setPrice(String(item.price)); setPickupPrice(String(item.pickup_price || 0)); setOpen(true);
+    setEditId(item.id); setOfficeId(item.office_id || ''); setGovernorate(item.governorate); setPrice(String(item.price)); setPickupPrice(String(item.pickup_price || 0)); setOpen(true);
   };
 
   const resetForm = () => { setEditId(null); setOfficeId(''); setGovernorate(''); setPrice(''); setPickupPrice(''); };
