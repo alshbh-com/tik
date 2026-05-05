@@ -32,14 +32,15 @@ export default function DeliveryPrices() {
   };
 
   const save = async () => {
-    if (!officeId || !governorate.trim()) { toast.error('المكتب والمحافظة مطلوبين'); return; }
+    if (!governorate.trim()) { toast.error('المحافظة مطلوبة'); return; }
     const p = parseFloat(price) || 0;
     const pp = parseFloat(pickupPrice) || 0;
+    const payload: any = { office_id: officeId || null, governorate, price: p, pickup_price: pp };
     if (editId) {
-      await supabase.from('delivery_prices').update({ office_id: officeId, governorate, price: p, pickup_price: pp }).eq('id', editId);
+      await supabase.from('delivery_prices').update(payload).eq('id', editId);
       toast.success('تم التعديل');
     } else {
-      await supabase.from('delivery_prices').insert({ office_id: officeId, governorate, price: p, pickup_price: pp });
+      await supabase.from('delivery_prices').insert(payload);
       toast.success('تم الإضافة');
     }
     setOpen(false); resetForm(); load();
