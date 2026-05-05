@@ -134,15 +134,11 @@ export default function CourierCollections() {
     })();
   }, [selectedCourier, closureDate]);
 
-  const deliveredStatus = statuses.find(s => s.name === 'تم التسليم');
-  const rejectWithShipStatus = statuses.find(s => s.name === 'رفض ودفع شحن');
-  const halfShipStatus = statuses.find(s => s.name === 'استلم ودفع نص الشحن');
-  const partialDeliveryStatus = statuses.find(s => s.name === 'تسليم جزئي');
-
   const getCollectedAmount = (order: any) => {
-    if (order.status_id === deliveredStatus?.id) return Number(order.price) + Number(order.delivery_price);
-    if (order.status_id === partialDeliveryStatus?.id) return Number(order.partial_amount || 0);
-    if (order.status_id === rejectWithShipStatus?.id || order.status_id === halfShipStatus?.id) return Number(order.shipping_paid || 0);
+    const statusName = order.order_statuses?.name || statuses.find(s => s.id === order.status_id)?.name;
+    if (DELIVERED_STATUS_NAMES.includes(statusName)) return Number(order.price || 0) + Number(order.delivery_price || 0);
+    if (PARTIAL_STATUS_NAMES.includes(statusName)) return Number(order.partial_amount || 0);
+    if (PAID_SHIPPING_STATUS_NAMES.includes(statusName)) return Number(order.shipping_paid || 0);
     return 0;
   };
 
