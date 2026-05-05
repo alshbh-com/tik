@@ -232,7 +232,7 @@ function ReceiptSection({ title, items, color }: { title: string; items: any[]; 
             <TableBody>
               {items.map(o => {
                 let amount = 0;
-                if (o.order_statuses?.name === 'تم التسليم') amount = Number(o.price || 0) + Number(o.delivery_price || 0);
+                if (o.order_statuses?.name === 'تم التسليم' || o.order_statuses?.name === 'تم التوصيل') amount = Number(o.price || 0) + Number(o.delivery_price || 0);
                 else if (o.order_statuses?.name === 'تسليم جزئي') amount = Number(o.partial_amount || 0);
                 else if (REJECTED_NAMES.includes(o.order_statuses?.name)) amount = Number(o.shipping_paid || 0);
                 return (
