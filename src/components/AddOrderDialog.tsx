@@ -26,6 +26,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
   const [offices, setOffices] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [statuses, setStatuses] = useState<any[]>([]);
+  const [governorates, setGovernorates] = useState<any[]>([]);
 
   // History for autocomplete
   const [history, setHistory] = useState<any[]>([]);
@@ -36,6 +37,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
     quantity: '', price: '', delivery_price: '',
     office_id: '', status_id: '',
     color: '', size: '', address: '', notes: '',
+    governorate: '',
     priority: 'normal',
   };
 
