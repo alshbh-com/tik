@@ -16,6 +16,11 @@ import { logActivity } from '@/lib/activityLogger';
 // Note: any order assigned to a courier can be closed regardless of its status
 import { ReportButton } from '@/components/ReportButton';
 
+const DELIVERED_STATUS_NAMES = ['تم التسليم', 'تم التوصيل'];
+const PARTIAL_STATUS_NAMES = ['تسليم جزئي'];
+const PAID_SHIPPING_STATUS_NAMES = ['رفض ودفع شحن', 'استلم ودفع نص الشحن'];
+const COMMISSION_STATUS_NAMES = [...DELIVERED_STATUS_NAMES, ...PARTIAL_STATUS_NAMES, ...PAID_SHIPPING_STATUS_NAMES];
+
 export default function CourierCollections() {
   const { user, isOwner } = useAuth();
   const [couriers, setCouriers] = useState<any[]>([]);
@@ -54,7 +59,6 @@ export default function CourierCollections() {
   }, []);
 
   // Auto-select commission-eligible statuses when statuses load
-  const COMMISSION_STATUS_NAMES = ['تم التسليم', 'تسليم جزئي', 'رفض ودفع شحن', 'استلم ودفع نص الشحن'];
   useEffect(() => {
     if (statuses.length === 0) return;
     const autoIds = statuses.filter(s => COMMISSION_STATUS_NAMES.includes(s.name)).map(s => s.id);
@@ -130,15 +134,11 @@ export default function CourierCollections() {
     })();
   }, [selectedCourier, closureDate]);
 
-  const deliveredStatus = statuses.find(s => s.name === 'تم التسليم');
-  const rejectWithShipStatus = statuses.find(s => s.name === 'رفض ودفع شحن');
-  const halfShipStatus = statuses.find(s => s.name === 'استلم ودفع نص الشحن');
-  const partialDeliveryStatus = statuses.find(s => s.name === 'تسليم جزئي');
-
   const getCollectedAmount = (order: any) => {
-    if (order.status_id === deliveredStatus?.id) return Number(order.price) + Number(order.delivery_price);
-    if (order.status_id === partialDeliveryStatus?.id) return Number(order.partial_amount || 0);
-    if (order.status_id === rejectWithShipStatus?.id || order.status_id === halfShipStatus?.id) return Number(order.shipping_paid || 0);
+    const statusName = order.order_statuses?.name || statuses.find(s => s.id === order.status_id)?.name;
+    if (DELIVERED_STATUS_NAMES.includes(statusName)) return Number(order.price || 0) + Number(order.delivery_price || 0);
+    if (PARTIAL_STATUS_NAMES.includes(statusName)) return Number(order.partial_amount || 0);
+    if (PAID_SHIPPING_STATUS_NAMES.includes(statusName)) return Number(order.shipping_paid || 0);
     return 0;
   };
 
@@ -358,9 +358,9 @@ export default function CourierCollections() {
             const COMMISSION_NAMES = COMMISSION_STATUS_NAMES;
             const getCollected = (o: any) => {
               const sn = o.order_statuses?.name;
-              if (sn === 'تم التسليم') return Number(o.price || 0) + Number(o.delivery_price || 0);
-              if (sn === 'تسليم جزئي') return Number(o.partial_amount || 0);
-              if (sn === 'رفض ودفع شحن' || sn === 'استلم ودفع نص الشحن') return Number(o.shipping_paid || 0);
+              if (DELIVERED_STATUS_NAMES.includes(sn)) return Number(o.price || 0) + Number(o.delivery_price || 0);
+              if (PARTIAL_STATUS_NAMES.includes(sn)) return Number(o.partial_amount || 0);
+              if (PAID_SHIPPING_STATUS_NAMES.includes(sn)) return Number(o.shipping_paid || 0);
               return 0;
             };
             const closedCount = closedOrdersOnDate.length;
