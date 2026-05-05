@@ -164,6 +164,8 @@ export default function Orders() {
           </Select>
           <Button size="sm" onClick={assignToCourier} disabled={!assignCourier}><UserPlus className="h-4 w-4 ml-1" />تعيين</Button>
           <Button size="sm" variant="outline" onClick={unassignCourier}><UserMinus className="h-4 w-4 ml-1" />إلغاء التعيين</Button>
+          <Button size="sm" variant="default" onClick={() => printStickers(orders.filter(o => selected.has(o.id)))}><Printer className="h-4 w-4 ml-1" />طباعة ملصقات</Button>
+          <Button size="sm" variant="outline" onClick={() => printInvoices(orders.filter(o => selected.has(o.id)))}><FileText className="h-4 w-4 ml-1" />طباعة فواتير</Button>
           <Button size="sm" variant="secondary" onClick={closeSelected}><Lock className="h-4 w-4 ml-1" />تقفيل</Button>
           {isOwner && <Button size="sm" variant="destructive" onClick={deleteSelected}><Trash2 className="h-4 w-4 ml-1" />حذف</Button>}
         </div>
