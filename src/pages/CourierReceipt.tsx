@@ -9,9 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { ReportButton } from '@/components/ReportButton';
 import { CheckCircle2, XCircle, RotateCcw, Package } from 'lucide-react';
 
-const DELIVERED_NAMES = ['تم التسليم', 'تسليم جزئي'];
-const RETURNED_NAMES = ['مرتجع', 'تهرب', 'لم يرد', 'ملغي'];
-const REJECTED_NAMES = ['رفض ودفع شحن', 'رفض ولم يدفع شحن'];
+const DELIVERED_NAMES = ['تم التسليم', 'تم التوصيل', 'تسليم جزئي'];
+const RETURNED_NAMES = ['مرتجع', 'تهرب', 'تهرب من الاستلام', 'لم يرد', 'ملغي'];
+const REJECTED_NAMES = ['رفض ودفع شحن', 'رفض ولم يدفع شحن', 'رفض ورفض'];
 
 export default function CourierReceipt() {
   const [couriers, setCouriers] = useState<any[]>([]);
