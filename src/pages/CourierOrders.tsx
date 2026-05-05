@@ -15,6 +15,18 @@ import { useCourierLocation } from '@/hooks/useCourierLocation';
 import { Badge } from '@/components/ui/badge';
 import { getHiddenActiveCourierOrderIds, isCourierOrderVisible } from '@/lib/courierClosure';
 
+const DELIVERED_STATUS_NAMES = ['تم التسليم', 'تم التوصيل'];
+const PARTIAL_STATUS_NAMES = ['تسليم جزئي'];
+const PAID_SHIPPING_STATUS_NAMES = ['رفض ودفع شحن', 'استلم ودفع نص الشحن'];
+
+const getOrderCollectedAmount = (order: any) => {
+  const statusName = order.order_statuses?.name;
+  if (DELIVERED_STATUS_NAMES.includes(statusName)) return Number(order.price || 0) + Number(order.delivery_price || 0);
+  if (PARTIAL_STATUS_NAMES.includes(statusName)) return Number(order.partial_amount || 0);
+  if (PAID_SHIPPING_STATUS_NAMES.includes(statusName)) return Number(order.shipping_paid || 0);
+  return 0;
+};
+
 export default function CourierOrders() {
   const { user, logout } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
