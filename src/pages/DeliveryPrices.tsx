@@ -72,10 +72,13 @@ export default function DeliveryPrices() {
             <DialogHeader><DialogTitle>{editId ? 'تعديل سعر' : 'إضافة سعر توصيل'}</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>المكتب *</Label>
-                <Select value={officeId} onValueChange={setOfficeId}>
-                  <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="اختر مكتب" /></SelectTrigger>
-                  <SelectContent>{offices.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}</SelectContent>
+                <Label>المكتب (اختياري — اتركه فارغ لتطبيق السعر على كل المكاتب)</Label>
+                <Select value={officeId || '__all__'} onValueChange={(v) => setOfficeId(v === '__all__' ? '' : v)}>
+                  <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="كل المكاتب" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__all__">كل المكاتب</SelectItem>
+                    {offices.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
+                  </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
