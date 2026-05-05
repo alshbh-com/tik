@@ -301,15 +301,41 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>العنوان</Label>
-            <AutocompleteInput
-              value={form.address}
-              onChange={v => set('address', v)}
-              suggestions={sugg.address}
-              className="bg-secondary border-border"
-              placeholder="العنوان بالتفصيل"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>المحافظة (اختياري)</Label>
+              <Select
+                value={form.governorate || '__none__'}
+                onValueChange={(v) => {
+                  if (v === '__none__') { set('governorate', ''); return; }
+                  set('governorate', v);
+                  // Auto-fill delivery price from matching row (prefer same office)
+                  const matches = governorates.filter(g => g.governorate === v);
+                  const match = matches.find(m => m.office_id === form.office_id) || matches[0];
+                  if (match && (!form.delivery_price || Number(form.delivery_price) === 0)) {
+                    set('delivery_price', String(match.price));
+                  }
+                }}
+              >
+                <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="اختر محافظة" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">— بدون —</SelectItem>
+                  {Array.from(new Set(governorates.map(g => g.governorate))).map(g => (
+                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>العنوان</Label>
+              <AutocompleteInput
+                value={form.address}
+                onChange={v => set('address', v)}
+                suggestions={sugg.address}
+                className="bg-secondary border-border"
+                placeholder="العنوان بالتفصيل"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
