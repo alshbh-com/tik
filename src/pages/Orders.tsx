@@ -7,13 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Search, UserPlus, Lock, Trash2, UserMinus, Pencil, Camera } from 'lucide-react';
+import { Search, UserPlus, Lock, Trash2, UserMinus, Pencil, Camera, Printer, FileText } from 'lucide-react';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { toast } from 'sonner';
 import AddOrderDialog from '@/components/AddOrderDialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { logActivity } from '@/lib/activityLogger';
 import { moveToTrash } from '@/lib/trashUtils';
+import { printStickers, printInvoices } from '@/lib/printOrders';
 
 export default function Orders() {
   const { isOwner } = useAuth();
