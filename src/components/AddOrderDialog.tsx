@@ -199,6 +199,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
         quantity: qty, price, delivery_price: deliveryPrice,
         color: form.color, size: form.size,
         address: form.address,
+        governorate: form.governorate || null,
         notes: form.notes || '',
         priority: form.priority || 'normal',
       };
