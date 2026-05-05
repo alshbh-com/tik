@@ -32,14 +32,15 @@ export default function DeliveryPrices() {
   };
 
   const save = async () => {
-    if (!officeId || !governorate.trim()) { toast.error('المكتب والمحافظة مطلوبين'); return; }
+    if (!governorate.trim()) { toast.error('المحافظة مطلوبة'); return; }
     const p = parseFloat(price) || 0;
     const pp = parseFloat(pickupPrice) || 0;
+    const payload: any = { office_id: officeId || null, governorate, price: p, pickup_price: pp };
     if (editId) {
-      await supabase.from('delivery_prices').update({ office_id: officeId, governorate, price: p, pickup_price: pp }).eq('id', editId);
+      await supabase.from('delivery_prices').update(payload).eq('id', editId);
       toast.success('تم التعديل');
     } else {
-      await supabase.from('delivery_prices').insert({ office_id: officeId, governorate, price: p, pickup_price: pp });
+      await supabase.from('delivery_prices').insert(payload);
       toast.success('تم الإضافة');
     }
     setOpen(false); resetForm(); load();
@@ -52,7 +53,7 @@ export default function DeliveryPrices() {
   };
 
   const edit = (item: any) => {
-    setEditId(item.id); setOfficeId(item.office_id); setGovernorate(item.governorate); setPrice(String(item.price)); setPickupPrice(String(item.pickup_price || 0)); setOpen(true);
+    setEditId(item.id); setOfficeId(item.office_id || ''); setGovernorate(item.governorate); setPrice(String(item.price)); setPickupPrice(String(item.pickup_price || 0)); setOpen(true);
   };
 
   const resetForm = () => { setEditId(null); setOfficeId(''); setGovernorate(''); setPrice(''); setPickupPrice(''); };
@@ -71,10 +72,13 @@ export default function DeliveryPrices() {
             <DialogHeader><DialogTitle>{editId ? 'تعديل سعر' : 'إضافة سعر توصيل'}</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>المكتب *</Label>
-                <Select value={officeId} onValueChange={setOfficeId}>
-                  <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="اختر مكتب" /></SelectTrigger>
-                  <SelectContent>{offices.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}</SelectContent>
+                <Label>المكتب (اختياري — اتركه فارغ لتطبيق السعر على كل المكاتب)</Label>
+                <Select value={officeId || '__all__'} onValueChange={(v) => setOfficeId(v === '__all__' ? '' : v)}>
+                  <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="كل المكاتب" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__all__">كل المكاتب</SelectItem>
+                    {offices.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
+                  </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">

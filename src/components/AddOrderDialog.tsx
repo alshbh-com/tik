@@ -26,6 +26,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
   const [offices, setOffices] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [statuses, setStatuses] = useState<any[]>([]);
+  const [governorates, setGovernorates] = useState<any[]>([]);
 
   // History for autocomplete
   const [history, setHistory] = useState<any[]>([]);
@@ -36,6 +37,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
     quantity: '', price: '', delivery_price: '',
     office_id: '', status_id: '',
     color: '', size: '', address: '', notes: '',
+    governorate: '',
     priority: 'normal',
   };
 
@@ -56,6 +58,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
     size: order?.size || '',
     address: order?.address || '',
     notes: order?.notes || '',
+    governorate: order?.governorate || '',
     priority: order?.priority || 'normal',
   });
 
@@ -87,10 +90,11 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
   };
 
   const loadDropdowns = async (orderForEdit?: any) => {
-    const [o, p, s] = await Promise.all([
+    const [o, p, s, g] = await Promise.all([
       supabase.from('offices').select('id, name').order('name'),
       supabase.from('products').select('id, name, quantity').order('name'),
       supabase.from('order_statuses').select('id, name').order('sort_order'),
+      supabase.from('delivery_prices').select('id, governorate, price, office_id').order('governorate'),
     ]);
 
     const loadedOffices = o.data || [];
@@ -106,6 +110,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
     setOffices(loadedOffices);
     setProducts(p.data || []);
     setStatuses(s.data || []);
+    setGovernorates(g.data || []);
   };
 
   // Build unique suggestion lists
@@ -194,6 +199,7 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
         quantity: qty, price, delivery_price: deliveryPrice,
         color: form.color, size: form.size,
         address: form.address,
+        governorate: form.governorate || null,
         notes: form.notes || '',
         priority: form.priority || 'normal',
       };
@@ -295,15 +301,41 @@ export default function AddOrderDialog({ onOrderAdded, editOrder, onClose }: Pro
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>العنوان</Label>
-            <AutocompleteInput
-              value={form.address}
-              onChange={v => set('address', v)}
-              suggestions={sugg.address}
-              className="bg-secondary border-border"
-              placeholder="العنوان بالتفصيل"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>المحافظة (اختياري)</Label>
+              <Select
+                value={form.governorate || '__none__'}
+                onValueChange={(v) => {
+                  if (v === '__none__') { set('governorate', ''); return; }
+                  set('governorate', v);
+                  // Auto-fill delivery price from matching row (prefer same office)
+                  const matches = governorates.filter(g => g.governorate === v);
+                  const match = matches.find(m => m.office_id === form.office_id) || matches[0];
+                  if (match && (!form.delivery_price || Number(form.delivery_price) === 0)) {
+                    set('delivery_price', String(match.price));
+                  }
+                }}
+              >
+                <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="اختر محافظة" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">— بدون —</SelectItem>
+                  {Array.from(new Set(governorates.map(g => g.governorate))).map(g => (
+                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>العنوان</Label>
+              <AutocompleteInput
+                value={form.address}
+                onChange={v => set('address', v)}
+                suggestions={sugg.address}
+                className="bg-secondary border-border"
+                placeholder="العنوان بالتفصيل"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
