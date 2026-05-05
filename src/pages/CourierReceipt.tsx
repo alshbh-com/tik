@@ -36,16 +36,31 @@ export default function CourierReceipt() {
     })();
   }, []);
 
+  const reload = async (courierId: string) => {
+    const { data } = await supabase
+      .from('orders')
+      .select('*, order_statuses(name, color), offices(name)')
+      .eq('courier_id', courierId)
+      .order('created_at', { ascending: false });
+    setOrders(data || []);
+  };
+
   useEffect(() => {
     if (!selectedCourier) { setOrders([]); return; }
-    (async () => {
-      const { data } = await supabase
-        .from('orders')
-        .select('*, order_statuses(name, color), offices(name)')
-        .eq('courier_id', selectedCourier)
-        .order('created_at', { ascending: false });
-      setOrders(data || []);
-    })();
+    reload(selectedCourier);
+
+    // Live updates: any change to this courier's orders refreshes the totals
+    const channel = supabase
+      .channel(`courier-receipt-${selectedCourier}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: `courier_id=eq.${selectedCourier}` }, () => {
+        reload(selectedCourier);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'order_statuses' }, () => {
+        reload(selectedCourier);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [selectedCourier]);
 
   const courier = profiles[selectedCourier];
